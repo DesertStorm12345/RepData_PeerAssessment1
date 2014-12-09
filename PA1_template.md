@@ -1,13 +1,9 @@
----
-title: "Reproducible Research: Peer Assessment 1" 
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
   
 ## Loading and preprocessing the data
-```{r}
+
+```r
 unzip("activity.zip")
 activity <- read.csv("activity.csv", colClasses=c("integer","Date","integer"))
 ```
@@ -16,18 +12,33 @@ activity <- read.csv("activity.csv", colClasses=c("integer","Date","integer"))
 
 1. Make a histogram of the total number of steps taken each day  
 
-```{r}
+
+```r
 totalsteps <- aggregate(activity[,"steps"], by=list(activity$date),FUN=sum, na.rm = TRUE)
 names(totalsteps) <- c("date","steps")
 hist(totalsteps$steps, main = "Steps Per Day", xlab="Total Steps", ylab="Frequency")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
 2. Calculate and report the **mean** and **median** total number of
    steps taken per day
 
-```{r}
+
+```r
 mean(totalsteps$steps)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(totalsteps$steps)
+```
+
+```
+## [1] 10395
 ```
 
 ## What is the average daily activity pattern?
@@ -36,18 +47,26 @@ median(totalsteps$steps)
    interval (x-axis) and the average number of steps taken, averaged
    across all days (y-axis)
 
-```{r}
+
+```r
 library(ggplot2)
 Avgsteps <- aggregate(activity[,"steps"], by=list(activity$interval), FUN=mean, na.rm=TRUE)
 names(Avgsteps) <- c("interval","steps")
 plot(Avgsteps$interval, Avgsteps$steps, type="l", xlab="Time Intervals (5-minute)",ylab = "Mean Steps", main = "Average Steps Taken at 5 minute Intervals")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
 2. Which 5-minute interval, on average across all the days in the
    dataset, contains the maximum number of steps?
 
-```{r}
+
+```r
 Avgsteps$interval[which.max(Avgsteps$steps)]
+```
+
+```
+## [1] 835
 ```
  
 
@@ -56,8 +75,13 @@ Avgsteps$interval[which.max(Avgsteps$steps)]
 1. Calculate and report the total number of missing values in the
    dataset (i.e. the total number of rows with `NA`s)  
    
-```{r}
+
+```r
 sum(is.na(activity))
+```
+
+```
+## [1] 2304
 ```
    
 2. Devise a strategy for filling in all of the missing values in the
@@ -66,7 +90,8 @@ sum(is.na(activity))
 3. Create a new dataset that is equal to the original dataset but with
    the missing data filled in.
 
-```{r}
+
+```r
 updactivity <- activity 
 for (i in 1:nrow(updactivity)) {
     if (is.na(updactivity$steps[i])) {
@@ -79,12 +104,29 @@ for (i in 1:nrow(updactivity)) {
    Calculate and report the **mean** and **median** total number of
    steps taken per day. 
 
-```{r}
+
+```r
 totalsteps <- aggregate(updactivity[,"steps"], by=list(updactivity$date),FUN=sum, na.rm = TRUE)
 names(totalsteps) <- c("date","steps")
 hist(totalsteps$steps, main = "Steps Per Day", xlab="Total Steps", ylab="Frequency")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
+
+```r
 mean(totalsteps$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(totalsteps$steps)
+```
+
+```
+## [1] 10766.19
 ```
 *Do these values differ from the estimates from the first part of the assignment?* 
 
@@ -102,7 +144,8 @@ median(totalsteps$steps)
    "weekday" and "weekend" indicating whether a given date is a
    weekday or weekend day.  
 
-```{r}
+
+```r
 days <- weekdays(updactivity$date)
 updactivity$day <- ifelse(days == "Saturday" | days == "Sunday", "Weekend", "Weekday")
 ```
@@ -112,9 +155,12 @@ updactivity$day <- ifelse(days == "Saturday" | days == "Sunday", "Weekend", "Wee
    taken, averaged across all weekday days or weekend days
    (y-axis).
    
-```{r}
+
+```r
 library(lattice)
 Avgstepsday <- aggregate(updactivity[,"steps"], by=list(updactivity$interval,updactivity$day), FUN=mean)
 names(Avgstepsday) <- c("interval","daytype", "steps")
 xyplot(steps ~ interval | daytype, Avgstepsday, type = "l", layout = c(1, 2), xlab = "Interval", ylab = "Number of Steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
